@@ -35,7 +35,7 @@ function ajax(name, locale) {
 }
 
 export const data = _.memoize(function book(name, locale = 'da_DK') {
-
+  
   return Rx.Observable.just(localStorage[storageId(name, locale)])
     .filter(x => x)
     .map(LZString.decompress)

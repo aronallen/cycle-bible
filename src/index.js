@@ -126,7 +126,6 @@ function bibleView(books) {
 }
 
 function header(book, chapter) {
-
   if (book && chapter) {
     var oneChapterBook = book && books[book][locale][1] === 1 || false;
     return h('h1', {className : 'header'}, [h('a', { dataset : {'href' : oneChapterBook ? '' : book}, className : 'header--back'}, '❮'), h('span', {className : 'header--title'}, name(book)), h('span', {className : 'header--chapter'}, [chapter])]);
@@ -141,19 +140,20 @@ function header(book, chapter) {
 
 
 function main() {
-  return function({DOM, History}) {
+  return function({DOM, History, Scroll}) {
     var $location = locationChanges(DOM).merge(History).distinctUntilChanged();
-
+    var max = _.max(_.keys(books), x => x.length).length;
+    var min = _.min(_.keys(books), x => x.length).length;
+    var regex = new RegExp('^([A-Z0-9]{'+min+','+max+'})\/?([0-9]+)?');
     return {
 
       DOM:
       $location
-      //move this to seperate driver?
       .flatMapLatest(r => {
-        var x = r.match(/^([A-Z0-9]{2,4})\/?([0-9]+)?/);
+
+        var x = r.match(regex);
         var book = x && x[1];
         var chpt = x && parseInt(x[2], 10);
-        //determine which view to use
         if (book && chpt || book && books[book][locale][1] === 1) {
           chpt = chpt || 1;
           return data(book).map(c => [c[chpt - 1], chpt, name(book), book]).map(_.spread(chapterView));
@@ -164,7 +164,8 @@ function main() {
         }
       }),
 
-      History : $location
+      History : $location,
+      Scroll : Rx.Observable.combineLatest(Scroll, $location)
     };
   };
 }
@@ -172,14 +173,50 @@ function main() {
 let drivers = {
   DOM: CycleDOM.makeDOMDriver('#app'),
   History : function ($location) {
-
     var location = window.location || document.location;
-
     $location.map(l => '#!' + l)
       .subscribe(l => location.hash = l);
     return Rx.Observable.fromEvent(window, 'hashchange')
       .map(() => location.hash)
       .startWith(window.location.hash).map(l => l.replace(/^#!/, ''));
+  },
+  Scroll  : function ($scroll) {
+    var store = {};
+
+    if (localStorage.latestScroll) {
+      let a = localStorage.latestScroll.split(':');
+      let path = a[0];
+      let position = parseInt(a[1], 10);
+      store[path] = position;
+    }
+
+    //apply scroll
+    $scroll
+    .distinctUntilChanged(_.last)
+    .map(_.last)
+    .map(path => store[path])
+    .delay(1)
+    .subscribe(position  => {
+      window.scrollTo(0, position | 0);
+    });
+
+    //store the scroll positions
+    $scroll
+    .subscribe(_.spread((position, path) => {
+      store[path] = position;
+      try {
+        localStorage.latestScroll = path + ':' + position;
+      } catch (e) {
+
+      }
+    }));
+
+    return Rx.Observable.fromEvent(document, 'scroll')
+    .map(e => e.target)
+    .merge(Rx.Observable.fromEvent(window, 'resize').map(() => document))
+    .map(t => t.scrollingElement)
+    .map(t => t.scrollTop)
+    .startWith(document.scrollingElement.scrollTop);
   }
 };
 
