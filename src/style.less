@@ -22,7 +22,8 @@
 }
 body{
   margin:0;
-  padding-top: 4.125em;
+  padding-top: 12/4em;
+  font-size: 14px;
 }
 .header--title{
   width: 100%;
@@ -30,7 +31,7 @@ body{
   box-sizing: border-box;
   text-overflow: ellipsis;
   overflow: hidden;
-  font-size: 2/3em;
+  font-size: 3em;
   line-height: 3/2em;
   height: 3/2em;
 }
@@ -39,9 +40,10 @@ body{
   user-select:none;
   margin:0;
   color:white;
-  background-color: red;
-  padding:1/3em 4/3em;
-  line-height: 1em;
+  background-color: #A82324;
+  padding:1em 4/3em;
+  line-height: 3em;
+  font-size: 1/2em;
   position: fixed;
   top:0;
   left:0;
@@ -50,17 +52,16 @@ body{
   text-align: center;
   box-sizing: border-box;
   margin:0;
-  font-size: 7/3em;
   white-space: nowrap;
   overflow: hidden;
   text-outline: ellipsis;
 }
 .header--back{
-  margin:2/5em;
+  margin:2/3em;
   width: 1em;
   display: inline-block;
   text-align: left;
-  font-size: 1em;
+  font-size: 8/3em;
   height: 1em;
   text-decoration: none;
   color:white;
@@ -75,7 +76,10 @@ body{
   top:0;
   width: 1em;
   height: 1em;
-  margin: 2/5em;
+  margin:2/3em;
+  width: 1em;
+  font-size: 8/3em;
+  height: 1em;
   text-align: right;
   display: inline-block;
   opacity: .5;
@@ -88,6 +92,7 @@ h2.books{
   float: left;
   width: 100%;
   margin:0;
+  box-sizing: border-box;
 }
 .book{
   text-decoration: none;
@@ -97,20 +102,17 @@ h2.books{
   box-sizing: border-box;
   p{
     margin:0;
+    padding:0;
   }
   color:black;
   border-bottom:1px solid rgba(0,0,0,.1);
-  &:first-child{
-    padding-top: 1em;
-  }
   &:last-child{
-    padding-bottom: 1em;
     border-bottom: none;
   }
 }
 .chapter-cell{
-  width: 48px;
-  height: 48px;
+  width: 3em;
+  height: 3em;
   display: inline-block;
   text-align: center;
   line-height: 48px;
@@ -120,6 +122,21 @@ h2.books{
   box-sizing: border-box;
   float: left;
 }
+.offline{
+  text-align: center;
+}
+.offline--title{
+  font-weight: normal;
+  font-style: italic;
+  
+}
+.offline--link{
+  text-align: inline-block;
+  padding: 0 1em;
+  font-size: 4/3em;
+  text-decoration: underline;
+}
+
 .verse{
   padding:0 .25em;
   box-sizing: border-box;
@@ -127,4 +144,13 @@ h2.books{
   float: left;
   margin:0;
   line-height: 5/3em;
+}
+.verse:first-child{
+  padding-top: 1em;
+}
+.verse:last-child{
+  padding-bottom: 1em;
+}
+p{
+  font-size: 1.25em;
 }

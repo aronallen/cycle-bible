@@ -24,28 +24,44 @@ function ajax(name, locale) {
     })
     .doAction(function(name, locale) {
       return function(chapters) {
-        try {
-          localStorage[storageId(name, locale)] = LZString.compress(
-            chapters);
-        } catch (e) {
-          console.error(e);
+        if (chapters) {
+          try {
+            localStorage[storageId(name, locale)] = LZString.compress(
+              chapters);
+          } catch (e) {
+            console.error(e);
+          }
+        } else {
+
         }
+
       };
     }(name, locale));
 }
 
-export const data = _.memoize(function book(name, locale = 'da_DK') {
-  
-  return Rx.Observable.just(localStorage[storageId(name, locale)])
-    .filter(x => x)
-    .map(LZString.decompress)
-    .merge(ajax(name, locale))
-    .map(JSON.parse)
-    .startWith(function(name) {
-      var a = [];
-      _.times(books[name][locale][1] || 1, a.push.bind(a));
-      return a.map(() => {
-        return [];
-      });
-    }(name));
-});
+function storage(name, locale) {
+  return LZString.decompress(localStorage[storageId(name, locale)]);
+}
+
+function defaultValue(name, locale) {
+  var a = [];
+  _.times(books[name][locale][1] || 1, a.push.bind(a));
+  return a.map(() => {
+    return [];
+  });
+}
+
+export const data = function book(name, locale = 'da_DK') {
+
+  return ajax(name, locale).catch(function (error) {
+      return Rx.Observable.just(storage(name, locale));
+    })
+    .map((json) => {
+      try {
+        return JSON.parse(json);
+      } catch (e) {
+        return defaultValue(name, locale);
+      }
+    })
+    .startWith(defaultValue(name, locale));
+};

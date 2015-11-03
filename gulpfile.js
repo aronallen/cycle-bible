@@ -6,7 +6,7 @@ var babelify = require('babelify');
 var less = require('gulp-less');
 var source = require('vinyl-source-stream');
 var autoprefixer = require('gulp-autoprefixer');
-
+var manifest = require('gulp-manifest');
 gulp.task('js', function () {
   browserify({
     entries : 'src/index.js',
@@ -39,7 +39,19 @@ gulp.task('css', function () {
   .pipe(gulp.dest('build'));
 });
 
-gulp.task('build', ['js', 'html', 'data', 'css']);
+gulp.task('manifest', function(){
+  gulp.src(['build/*.{css,html,js}'], { base: 'build/' })
+    .pipe(manifest({
+      hash: true,
+      preferOnline: true,
+      network: ['*'],
+      filename: 'app.manifest',
+      exclude: 'app.manifest'
+   }))
+  .pipe(gulp.dest('build'));
+});
+
+gulp.task('build', ['js', 'html', 'data', 'css', 'manifest']);
 
 gulp.task('default', ['build', 'serve']);
 
